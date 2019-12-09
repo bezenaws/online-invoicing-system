@@ -157,8 +157,10 @@
 					records: [],
 
 					_updateCurrentRecord: function() {
+						if(!this.hasCalculatedFields) return;
+
 						if(!this.running) return;
-						
+
 						if(this.current >= this.last) {
 							this.running = false;
 							return;
@@ -186,18 +188,28 @@
 						currentRecord.updateStatus = updateStatus.INPROGRESS;
 
 // TODO: Stopped here:
-//      data to send (table name, pk)?
-//      handle case when table has no calculated fields ....
 //      handle network connection errors ....
+//			perhaps add a retries counter to currentRecord?
+//			reset to 0 on success, or increment on error
+//			if retries > 3, increment current and proceed?
 //      
 						launchAjaxUpdateCalculatedRecord({
 							data: {
-
+								table: this.tn,
+								id: currentRecord.pk
 							},
 							error: function() {
 								currentRecord.updateStatus = updateStatus.ERROR;
 							},
 							success: function(resp) {
+								// handle case when table has no calculated fields ....
+								if(resp.error.length) {
+									if(resp.error == 'No fields to calculate in this table') {
+										this.hasCalculatedFields = false;
+										return;
+									}
+								}
+
 								currentRecord.updateStatus = updateStatus.DONE;
 							},
 							complete: function() {
