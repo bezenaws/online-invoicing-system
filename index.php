@@ -1,3 +1,5 @@
-<?php
-	// redirect to app folder ...
-	header('Location: app/index.php');
+<HTML>
+	<Body>
+		<p>This is a test.</p>
+	</Body>
+</HTML>
